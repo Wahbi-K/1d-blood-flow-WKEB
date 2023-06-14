@@ -1,0 +1,47 @@
+*.cache
+Pulsatile_Model/Blood Flow Model/bin/
+Pulsatile_Model/Blood Flow Model/obj/
+Pulsatile_Model/Blood Flow Model/.vs/
+build
+.pytest_cache/
+__pycache__
+_build
+.idea/
+.DS_*
+
+# output
+*.pdf
+*.jpg
+*.png
+*.log
+*.gz
+*.tar.gz
+*.coverage*
+cov_html/
+htmlcov/
+coverage.xml
+
+# jupyter notebook
+*.ipynb_checkpoints/*
+*.ipynb
+
+# containers
+*.sif
+.vagrant/
+
+# local installation
+*.egg*
+
+# configurations
+*.json
+
+# no virtualenv
+venv
+
+# no tox
+*.tox
+
+# do not consider any local/temp storage from QCG
+.qcg*
+
+

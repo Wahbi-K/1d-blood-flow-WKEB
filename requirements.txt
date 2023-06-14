@@ -1,0 +1,15 @@
+desist==0.1.0
+h5py==3.5.0
+lxml==4.6.4
+matplotlib==3.4.3
+mgmetis==0.1.1
+networkx==2.6.3
+numpy==1.21.3
+pyacvd==0.2.7
+PyQt5==5.15.6
+pyvista==0.33.2
+PyYAML==6.0
+scipy==1.7.1
+setuptools==58.5.2
+tqdm==4.62.3
+vtk==9.0.3

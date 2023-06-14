@@ -1,0 +1,49 @@
+Bootstrap: docker
+From: continuumio/miniconda3
+
+%files
+    ./ /app
+
+%post
+    apt-get update && apt-get install -y \
+                gnupg \
+                apt-transport-https \
+                software-properties-common \
+                ca-certificates \
+                dirmngr \
+                gcc \
+                g++
+
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    echo "deb https://download.mono-project.com/repo/debian stable-buster main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+                bash \
+                mono-devel \
+                msbuild \
+                libgl1-mesa-glx
+
+    # compile and make executable 
+    cd /app/Pulsatile_Model/ && msbuild "Blood Flow Model.sln" && chmod +x "Blood Flow Model/bin/Debug/BloodflowModel.exe"
+
+    # install conda env and python packages
+    conda update -n base -c defaults conda -y
+    conda create -n bloodflow -c conda-forge python=3.9 Cython -y
+    . /opt/conda/etc/profile.d/conda.sh
+
+    # bug in conda https://github.com/conda/conda/issues/9959
+    test -f /opt/conda/envs/bloodflow/etc/conda/deactivate.d/deactivate-binutils_linux-64.sh && sed -i 's/function //' /opt/conda/envs/bloodflow/etc/conda/deactivate.d/deactivate-binutils_linux-64.sh
+    test -f /opt/conda/envs/bloodflow/etc/conda/deactivate.d/deactivate-gcc_linux-64.sh && sed -i 's/function //' /opt/conda/envs/bloodflow/etc/conda/deactivate.d/deactivate-gcc_linux-64.sh
+    test -f /opt/conda/envs/bloodflow/etc/conda/deactivate.d/deactivate-gxx_linux-64.sh && sed -i 's/function //' /opt/conda/envs/bloodflow/etc/conda/deactivate.d/deactivate-gxx_linux-64.sh
+    test -f /opt/conda/envs/bloodflow/etc/conda/activate.d/activate-binutils_linux-64.sh && sed -i 's/function //' /opt/conda/envs/bloodflow/etc/conda/activate.d/activate-binutils_linux-64.sh
+    test -f /opt/conda/envs/bloodflow/etc/conda/activate.d/activate-gcc_linux-64.sh && sed -i 's/function //' /opt/conda/envs/bloodflow/etc/conda/activate.d/activate-gcc_linux-64.sh
+    test -f /opt/conda/envs/bloodflow/etc/conda/activate.d/activate-gxx_linux-64.sh && sed -i 's/function //' /opt/conda/envs/bloodflow/etc/conda/activate.d/activate-gxx_linux-64.sh
+
+    conda activate bloodflow
+    cd /app/ && pip install --no-cache-dir ./in-silico-trial
+    cd /app/ && pip install --no-cache-dir .
+
+%runscript
+    export DIJITSO_CACHE_DIR=/patient/.cache
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate bloodflow
+    cd /app/ && exec python3 API.py "$@"
